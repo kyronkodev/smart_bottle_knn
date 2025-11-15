@@ -315,12 +315,74 @@ See `MODEL_PROPOSAL.md` for improvement roadmap.
 - **Model Proposal**: `MODEL_PROPOSAL.md` - Detailed improvement plan
 - **API Reference**: http://localhost:8000/docs (when server running)
 
+## 🐧 Ubuntu Server Deployment
+
+### Prerequisites
+```bash
+# Install build tools and Python development headers
+sudo apt update
+sudo apt install -y build-essential python3-dev python3.10-venv
+```
+
+### Deployment Steps
+```bash
+# 1. Clone repository
+git clone <repository-url>
+cd smartbottle_model
+
+# 2. Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Train model
+python3 scripts/retrain_model.py
+
+# 5. Prepare model
+[ -f models/trained/knn_v1_legacy.pkl ] && mv models/trained/knn_v1_legacy.pkl models/trained/knn_v1_legacy_old.pkl
+mv models/trained/knn_v1_retrained.pkl models/trained/knn_v1_legacy.pkl
+
+# 6. Run server
+uvicorn api.main:app --host 0.0.0.0 --port 8000
+```
+
+### Background Execution
+```bash
+# Run in background with logs
+nohup uvicorn api.main:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &
+
+# Check server status
+ps aux | grep uvicorn
+
+# View logs
+tail -f server.log
+
+# Stop server
+kill <PID>
+```
+
+### Port Check
+```bash
+# Check if port 8000 is available
+sudo lsof -i :8000
+# OR
+sudo ss -tulpn | grep :8000
+# OR
+sudo netstat -tulpn | grep :8000
+```
+
 ## 🔧 Troubleshooting
 
 ### Model Not Loading
 ```bash
 # Check model file exists
 ls -lh models/trained/knn_v1_legacy.pkl
+
+# Retrain if missing
+python3 scripts/retrain_model.py
+mv models/trained/knn_v1_retrained.pkl models/trained/knn_v1_legacy.pkl
 
 # Check data files exist
 ls -lh data/raw/
@@ -333,15 +395,33 @@ python config/database.py
 
 # Check .env file
 cat .env
+
+# Verify credentials
+mysql -h 211.192.7.222 -u <username> -p smart_bottle
 ```
 
 ### API Server Won't Start
 ```bash
 # Check port availability
-lsof -i :8000
+sudo lsof -i :8000
+
+# Check Python version
+python3 --version  # Should be 3.10+
 
 # Check dependencies
-pip list | grep fastapi
+pip list | grep -E "fastapi|uvicorn|scikit-learn"
+
+# Check virtual environment
+which python3
+```
+
+### Package Installation Errors
+```bash
+# scikit-surprise build error
+sudo apt install -y build-essential python3-dev
+
+# Permission denied
+sudo chown -R $USER:$USER .
 ```
 
 ## 🤝 Contributing
@@ -365,3 +445,28 @@ For questions or issues:
 **Version**: 1.0.0
 **Python**: 3.10+
 **Status**: Development
+
+# 1. 저장소 클론
+git clone <repository-url>
+cd smartbottle_model
+
+# 2. 빌드 도구 설치 (우분투)
+sudo apt update
+sudo apt install -y build-essential python3-dev python3.10-venv
+
+# 3. 가상환경 생성
+python3 -m venv venv
+source venv/bin/activate
+
+# 4. 패키지 설치
+pip install -r requirements.txt
+
+# 5. 모델 학습
+python3 scripts/retrain_model.py
+mv models/trained/knn_v1_retrained.pkl models/trained/knn_v1_legacy.pkl
+
+# 6. 서버 실행
+uvicorn api.main:app --host 0.0.0.0 --port 8000
+
+# 백그라운드 실행
+nohup uvicorn api.main:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &

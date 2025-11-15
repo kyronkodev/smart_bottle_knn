@@ -94,7 +94,7 @@ class FormulaRecommender:
             except ValueError:
                 raise ValueError(f"'good' class not found in: {classes}")
 
-            # Create candidates by combining baby profile with each formula
+            # 1. 아기 프로필과 6가지 분유 조합 생성
             candidates = []
             for _, formula in self.formula_df.iterrows():
                 candidate = {**baby_profile}
@@ -110,7 +110,7 @@ class FormulaRecommender:
             candidates_df = pd.DataFrame(candidates)
             X_candidates = candidates_df[self.feature_cols]
 
-            # Predict probabilities
+           # 2. KNN 모델로 예측
             prob_matrix = self.model.predict_proba(X_candidates)
             good_probs = prob_matrix[:, good_index]
 
@@ -133,7 +133,7 @@ class FormulaRecommender:
                 }
                 recommendations.append(rec)
 
-            # Sort by good probability
+            # 3. 확률 순 정렬 및 Top N 반환
             recommendations.sort(key=lambda x: x["good_probability"], reverse=True)
 
             # Filter by minimum probability

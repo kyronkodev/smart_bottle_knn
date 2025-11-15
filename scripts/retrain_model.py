@@ -87,6 +87,7 @@ categorical_features = [
 ]
 
 print("\n5. Creating preprocessing pipeline...")
+# 전처리 파이프라인 정의
 numeric_transformer = Pipeline(steps=[("scaler", StandardScaler())])
 categorical_transformer = Pipeline(steps=[("onehot", OneHotEncoder(handle_unknown="ignore"))])
 
@@ -98,6 +99,7 @@ preprocessor = ColumnTransformer(
 )
 
 # 6. Create model pipeline
+# KNN 모델 생성
 print("\n6. Creating KNN model...")
 knn_clf = KNeighborsClassifier(n_neighbors=5, weights="distance")
 
