@@ -1,0 +1,7 @@
+formula_id,formula_brand,category,lactose_level,target_issue,protein_type
+1,MilkySoft_Normal,normal,normal,none,standard
+2,MilkySoft_Sensitive,sensitive,normal,sensitive,partially_hydrolyzed
+3,LactoFree,low_lactose,low_lactose,lactose_intolerance,standard
+4,GutCare_Constipation,constipation_care,normal,constipation,standard
+5,GentlePlus,gentle,normal,digestion,standard
+6,PremiumHA,allergy_care,normal,allergy,extensively_hydrolyzed
